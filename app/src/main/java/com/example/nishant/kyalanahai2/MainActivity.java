@@ -3,6 +3,7 @@ package com.example.nishant.kyalanahai2;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -13,9 +14,10 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    private String saveString = "";
     private ListView listView;
     private static List<String> listArray = new ArrayList<String>();
-    private static final String LIST_SHARED_PREFERENCES = "Default";
+    private SaveListInSharedPreferences saveListInSharedPreferences = new SaveListInSharedPreferences();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,12 +25,18 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         SharedPreferences settings = getPreferences(MODE_PRIVATE);
-        String savedData = settings.getString(LIST_SHARED_PREFERENCES, null);
+        String savedData = settings.getString(saveString, "");
+        if (!savedData.isEmpty()){
+            listArray = saveListInSharedPreferences.getList(savedData);
+            Log.d("isRunning : ", "True" );
+        }
 
         listView = (ListView)findViewById(R.id.itemList);
         Button button = (Button)findViewById(R.id.addButton);
 
-        createAndSetAdapter();
+        if (!listArray.isEmpty()) {
+            createAndSetAdapter();
+        }
 
         button.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -38,17 +46,37 @@ public class MainActivity extends AppCompatActivity {
                 if (!itemName.isEmpty()){
                     listArray.add(itemName);
                 }
-
-                createAndSetAdapter();
+                if (!listArray.isEmpty()) {
+                    createAndSetAdapter();
+                }
                 itemNameView.setText("");
+            }
+        });
+
+        Button clearButton = (Button)findViewById(R.id.clearButton);
+        clearButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                listArray.clear();
+                listView.setAdapter(null);
             }
         });
     }
 
     public void createAndSetAdapter(){
-        if (!listArray.isEmpty()){
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, listArray);
-            listView.setAdapter(adapter);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, listArray);
+        listView.setAdapter(adapter);
+    }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        if (listArray != null){
+            String listAsString = saveListInSharedPreferences.putList(listArray);
+            SharedPreferences settings = getPreferences(MODE_PRIVATE);
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putString(saveString, listAsString);
+            editor.apply();
         }
     }
 }
