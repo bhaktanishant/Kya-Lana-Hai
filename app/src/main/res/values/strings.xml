@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">KyaLanaHai2</string>
+    <string name="detail">Saamaan yaha dikhega.</string>
+    <string name="add_button_text">Add Karo</string>
+    <string name="clear_button">New List</string>
+    <string name="edit_text_hint">Saamaan ka naam</string>
+    <string name="main_menu_creator">Creator</string>
+    <string name="popup_menu_mil_gya">Mil gaya</string>
+    <string name="pupup_menu_nahi_mila">Nahi mila</string>
+    <string name="popup_menu_delete_saamaan">Delete</string>
 </resources>
